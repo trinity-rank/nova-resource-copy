@@ -1,10 +1,3 @@
-# Very short description of the package
-
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/trinityrank/geo-location.svg?style=flat-square)](https://packagist.org/packages/trinityrank/geo-location)
-[![Total Downloads](https://img.shields.io/packagist/dt/trinityrank/geo-location.svg?style=flat-square)](https://packagist.org/packages/trinityrank/geo-location)
-
-Choose to show or hide Operaters by choosing the countries from list.
-
 ## Installation
 
 ### Step 1: Install package
@@ -15,7 +8,7 @@ To get started with Laravel Geo Location, use Composer command to add the packag
     composer require trinityrank/nova-resource-copy
 ```
 
-### Step 2: Migration
+### Step 2: Configuration
 
 - You need to import class in Nova ressource
 
@@ -29,7 +22,63 @@ To get started with Laravel Geo Location, use Composer command to add the packag
     public function actions(Request $request)
     {
         return [
-            new NovaResourceCopy
+            new NovaResourceCopy([])
         ];
     }
 ```
+
+- If you want to copy relationships which are related to the model (now is only available polymorphic) 
+
+```shell
+    public function actions(Request $request)
+    {
+        return [
+            new NovaResourceCopy([
+                'relation_tables' => [
+                    [                  
+                        'table_name' => "categoriables",
+                        'foreign_key_name' => "categoriable"
+                    ],
+                ]
+            ]) 
+        ];
+    }
+```
+
+- Define the columns you want to add copy 
+- Columns title, slug and status have default copy values
+
+```shell
+    public function actions(Request $request)
+    {
+        return [
+            new NovaResourceCopy([
+                'copy_columns' => ['name']
+            ]) 
+        ];
+    }
+```
+
+- Example
+
+```shell
+    public function actions(Request $request)
+    {
+        return [
+            new NovaResourceCopy([
+                'relation_tables' => [
+                    [                  
+                        'table_name' => "categoriables",
+                        'foreign_key_name' => "categoriable"
+                    ],
+                    [
+                        'table_name' => "seos",
+                        'foreign_key_name' => "seoable"
+                    ],
+                ],
+                'copy_columns' => ['name', 'description']
+            ]) 
+        ];
+    }
+```
+
