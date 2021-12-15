@@ -16,6 +16,13 @@ class NovaResourceCopy extends Action
 {
     use InteractsWithQueue, Queueable;
 
+    protected $data;
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
     public $name = 'Copy Row';
     
     public function handle(ActionFields $fields, Collection $models)
