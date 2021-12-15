@@ -1,0 +1,40 @@
+{
+    "name": "trinityrank/nova-resource-copy",
+    "description": "LaravelNovaResourceCopy - copy table rows for Nova admin panel",
+    "keywords": [
+        "laravel",
+        "nova",
+        "trinityrank",
+        "nova-resource-copy"
+    ],
+    "homepage": "https://github.com/trinity-rank/nova-resource-copy",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "TrinityRank DevTeam",
+            "email": "trinitydevbg@gmail.com",
+            "role": "Team"
+        }
+    ],
+    "require": {
+        "php": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Trinityrank\\LaravelNovaResourceCopy\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Trinityrank\\LaravelNovaResourceCopy\\NovaResourceCopyServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
