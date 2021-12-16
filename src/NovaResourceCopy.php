@@ -27,6 +27,8 @@ class NovaResourceCopy extends Action
     
     public function handle(ActionFields $fields, Collection $models)
     {
+        $table_name = $models->first()->getTable();
+
         foreach ($models as $model) {
             $newModel = $model->replicate();
 
@@ -38,9 +40,24 @@ class NovaResourceCopy extends Action
             $newModel->title = $model->title . " copy";
             }
             if ($newModel->slug) {
-            $newModel->slug = Str::contains($model->slug, ['-copy-']) 
-                ? Str::of($model->slug)->before('-copy-') . '-copy-' . rand()
-                : $model->slug . '-copy-' . rand();
+                $array_of_slugs = DB::table($table_name)->pluck('slug');
+
+                if ( Str::contains($model->slug, ['-copy-']) ) {
+                    $model_slugs = $array_of_slugs->filter(function ($value, $key) use ($model) {
+                        return  (string)Str::of($model->slug)->before('-copy-') 
+                        ===     (string)Str::of($value)->before('-copy-');
+                    });
+
+                    $biggest_numbers = $model_slugs->map(function ($item, $key) {
+                       return (string)Str::of($item)->after('-copy-');
+                    })->toArray();
+
+                    $biggest_number = max($biggest_numbers);
+                    $newModel->slug = Str::of($model->slug)->before('-copy-') . '-copy-' . (int)($biggest_number) + 1;
+
+                } else {
+                    $newModel->slug = $model->slug . '-copy-' . 1;
+                }
             }
 
             //enter columns
