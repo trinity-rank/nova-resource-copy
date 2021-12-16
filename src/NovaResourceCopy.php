@@ -52,11 +52,25 @@ class NovaResourceCopy extends Action
                        return (string)Str::of($item)->after('-copy-');
                     })->toArray();
 
-                    $biggest_number = max($biggest_numbers);
-                    $newModel->slug = Str::of($model->slug)->before('-copy-') . '-copy-' . (int)($biggest_number) + 1;
+                    $int_biggest_numbers = array_map('intval', $biggest_numbers);
+                    $biggest_number = max($int_biggest_numbers);
+                    $newModel->slug = Str::of($model->slug)->before('-copy-') . '-copy-' . $biggest_number + 1;
 
                 } else {
-                    $newModel->slug = $model->slug . '-copy-' . 1;
+                    $model_slugs = $array_of_slugs->filter(function ($value, $key) use ($model) {
+                        return  (string)Str::of($model->slug)->before('-copy-') 
+                        ===     (string)Str::of($value)->before('-copy-');
+                    });
+
+                    $biggest_numbers = $model_slugs->map(function ($item, $key) {
+                       return (string)Str::of($item)->after('-copy-');
+                    })->toArray();
+
+                    $int_biggest_numbers = array_map('intval', $biggest_numbers);
+                    $biggest_number = max($int_biggest_numbers);
+                    $newModel->slug = $model_slugs->count() > 1 
+                                      ? Str::of($model->slug)->before('-copy-') . '-copy-' . $biggest_number + 1
+                                      : $model->slug . '-copy-' . 1;
                 }
             }
 
@@ -95,14 +109,11 @@ class NovaResourceCopy extends Action
                         $record = json_decode(json_encode($rowData), true);
 
                         DB::table($item['table_name'])->insert($record );
-
                     }
-
                 });
             }
-
         }
-
+        
         return Action::message("Selected rows are copied");
     }
 
