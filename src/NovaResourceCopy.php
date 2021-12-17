@@ -85,27 +85,27 @@ class NovaResourceCopy extends Action
 
             $newModel->save();
 
-            //relationships pivot:
-            if ( !Schema::hasColumn($item['table_name'], $item['foreign_key_name'] . '_type') ){
-                $rowData = DB::table($item['table_name'])->where([
-                    [ $item['foreign_key_name'] . '_id', '=', $model->id ],
-                ])->first();
-
-                unset($rowData->id);
-                $x = $item['foreign_key_name'] . '_id';
-                $rowData->$x  = $newModel->id;
-
-                $record = json_decode(json_encode($rowData), true);
-
-                DB::table($item['table_name'])->insert($record );
-            }
-
-            //realtioship polymorphic:
-            elseif ( isset($this->data['relation_tables']) ) {
+            if ( isset($this->data['relation_tables']) ) {
 
                 collect($this->data['relation_tables'])->each(function ($item) use ($newModel, $model) {
 
-                    if ( Schema::hasColumn($item['table_name'], $item['foreign_key_name'] . '_id') 
+                    //relationships pivot:
+                    if ( !Schema::hasColumn($item['table_name'], $item['foreign_key_name'] . '_type') ){
+                        $rowData = DB::table($item['table_name'])->where([
+                            [ $item['foreign_key_name'] . '_id', '=', $model->id ],
+                        ])->first();
+
+                        unset($rowData->id);
+                        $x = $item['foreign_key_name'] . '_id';
+                        $rowData->$x  = $newModel->id;
+
+                        $record = json_decode(json_encode($rowData), true);
+
+                        DB::table($item['table_name'])->insert($record );
+                    }
+
+                    //realtioship polymorphic:
+                    elseif ( Schema::hasColumn($item['table_name'], $item['foreign_key_name'] . '_id') 
                         &&  DB::table($item['table_name'])->where([
                                 [ $item['foreign_key_name'] . '_id', '=', $model->id ],
                                 [ $item['foreign_key_name'] . '_type', '=', get_class($model)],
