@@ -27,7 +27,7 @@ To get started with Laravel Geo Location, use Composer command to add the packag
     }
 ```
 
-- If you want to copy relationships which are related to the model (now is only available polymorphic) 
+- If you want to copy relationships which are related to the model
 
 ```shell
     public function actions(Request $request)
@@ -36,8 +36,12 @@ To get started with Laravel Geo Location, use Composer command to add the packag
             new NovaResourceCopy([
                 'relation_tables' => [
                     [                  
-                        'table_name' => "categoriables",
-                        'foreign_key_name' => "categoriable"
+                        'table_name' => 'categoriables',
+                        'foreign_key_name' => 'categoriable'
+                    ],
+                    [                  
+                        'table_name' => 'job_tag',
+                        'foreign_key_name' => 'job'
                     ],
                 ]
             ]) 
@@ -68,12 +72,16 @@ To get started with Laravel Geo Location, use Composer command to add the packag
             new NovaResourceCopy([
                 'relation_tables' => [
                     [                  
-                        'table_name' => "categoriables",
-                        'foreign_key_name' => "categoriable"
+                        'table_name' => 'categoriables',
+                        'foreign_key_name' => 'categoriable'
                     ],
                     [
-                        'table_name' => "seos",
-                        'foreign_key_name' => "seoable"
+                        'table_name' => 'seos',
+                        'foreign_key_name' => 'seoable'
+                    ],
+                    [                  
+                        'table_name' => 'job_tag',
+                        'foreign_key_name' => 'job'
                     ],
                 ],
                 'copy_columns' => ['name', 'description']
