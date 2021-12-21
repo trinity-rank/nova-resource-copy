@@ -29,7 +29,7 @@ class NovaResourceCopy extends Action
     {
         $table_name = $models->first()->getTable();
 
-        $models->each(function ($model) {
+        $models->each(function ($model) use ($table_name) {
             $newModel = $model->replicate();
 
             //default columns
