@@ -22,29 +22,8 @@ To get started with Laravel Geo Location, use Composer command to add the packag
     public function actions(Request $request)
     {
         return [
-            new NovaResourceCopy([])
-        ];
-    }
-```
-
-- If you want to copy relationships which are related to the model
-
-```shell
-    public function actions(Request $request)
-    {
-        return [
             new NovaResourceCopy([
-                'relation_tables' => [
-                    [                  
-                        'table_name' => 'categoriables',
-                        'foreign_key_name' => 'categoriable'
-                    ],
-                    [                  
-                        'table_name' => 'job_tag',
-                        'foreign_key_name' => 'job'
-                    ],
-                ]
-            ]) 
+                ])
         ];
     }
 ```
@@ -57,7 +36,21 @@ To get started with Laravel Geo Location, use Composer command to add the packag
     {
         return [
             new NovaResourceCopy([
-                'copy_columns' => ['name']
+                ['name', 'title']
+            ]) 
+        ];
+    }
+```
+
+- If you want to copy relationships which are related to the model
+
+```shell
+    public function actions(Request $request)
+    {
+        return [
+            new NovaResourceCopy([
+                [],
+                [['categoriables','categoriable']]
             ]) 
         ];
     }
@@ -70,21 +63,8 @@ To get started with Laravel Geo Location, use Composer command to add the packag
     {
         return [
             new NovaResourceCopy([
-                'relation_tables' => [
-                    [                  
-                        'table_name' => 'categoriables',
-                        'foreign_key_name' => 'categoriable'
-                    ],
-                    [
-                        'table_name' => 'seos',
-                        'foreign_key_name' => 'seoable'
-                    ],
-                    [                  
-                        'table_name' => 'job_tag',
-                        'foreign_key_name' => 'job'
-                    ],
-                ],
-                'copy_columns' => ['name', 'description']
+                ['name', 'title'], 
+                [['categoriables','categoriable'], ['seos','seoable'], ['job_tag', job]]
             ]) 
         ];
     }

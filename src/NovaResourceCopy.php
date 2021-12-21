@@ -23,21 +23,18 @@ class NovaResourceCopy extends Action
         $this->data = $data;
     }
 
-    public $name = 'Copy Row';
+    public $name = 'Copy Resource';
     
     public function handle(ActionFields $fields, Collection $models)
     {
         $table_name = $models->first()->getTable();
 
-        foreach ($models as $model) {
+        $models->each(function ($model) {
             $newModel = $model->replicate();
 
             //default columns
             if ($newModel->status) {
             $newModel->status = false;
-            }
-            if ($newModel->title) {
-            $newModel->title = $model->title . " copy";
             }
             if ($newModel->slug) {
                 $array_of_slugs = DB::table($table_name)->pluck('slug');
@@ -75,61 +72,63 @@ class NovaResourceCopy extends Action
             }
 
             //enter columns
-            if ( isset($this->data['copy_columns']) ) {
-                collect($this->data['copy_columns'])->each(function ($item) use ($newModel, $model) {
-                    if ($newModel->$item && !in_array($item, ['slug', 'status', 'title'])) {
-                        $newModel->$item = $model->$item . " copy";
+            if ( isset($this->data[0]) ) {
+                collect($this->data[0])->each(function ($item) use ($newModel, $model) {
+                    if ($newModel->$item && !in_array($item, ['slug', 'status'])) {
+                        $newModel->$item = $model->$item . " - Copy";
                     }
                 });
             }
 
+            //saving copy
             $newModel->save();
 
-            if ( isset($this->data['relation_tables']) ) {
+            //relationships
+            if ( isset($this->data[1]) ) { 
 
-                collect($this->data['relation_tables'])->each(function ($item) use ($newModel, $model) {
+                collect($this->data[1])->each(function ($item) use ($newModel, $model) {
 
-                    //relationships pivot:
-                    if ( !Schema::hasColumn($item['table_name'], $item['foreign_key_name'] . '_type') ){
-                        $rowData = DB::table($item['table_name'])->where([
-                            [ $item['foreign_key_name'] . '_id', '=', $model->id ],
+                    //relationship pivot:
+                    if ( !Schema::hasColumn($item[0], $item[1] . '_type') ){
+                        $rowData = DB::table($item[0])->where([
+                            [ $item[1] . '_id', '=', $model->id ],
                         ])->first();
 
                         unset($rowData->id);
-                        $x = $item['foreign_key_name'] . '_id';
+                        $x = $item[1] . '_id';
                         $rowData->$x  = $newModel->id;
 
                         $record = json_decode(json_encode($rowData), true);
 
-                        DB::table($item['table_name'])->insert($record );
+                        DB::table($item[0])->insert($record);
                     }
 
-                    //realtioship polymorphic:
-                    elseif ( Schema::hasColumn($item['table_name'], $item['foreign_key_name'] . '_id') 
-                        &&  DB::table($item['table_name'])->where([
-                                [ $item['foreign_key_name'] . '_id', '=', $model->id ],
-                                [ $item['foreign_key_name'] . '_type', '=', get_class($model)],
+                    //relationship polymorphic:
+                    elseif ( Schema::hasColumn($item[0], $item[1] . '_id') 
+                        &&  DB::table($item[0])->where([
+                                [ $item[1] . '_id', '=', $model->id ],
+                                [ $item[1] . '_type', '=', get_class($model)],
                             ])->exists()                                     
                         ){
 
-                        $rowData = DB::table($item['table_name'])->where([
-                            [ $item['foreign_key_name'] . '_id', '=', $model->id ],
-                            [ $item['foreign_key_name'] . '_type', '=', get_class($model) ],
+                        $rowData = DB::table($item[0])->where([
+                            [ $item[1] . '_id', '=', $model->id ],
+                            [ $item[1] . '_type', '=', get_class($model) ],
                         ])->first();
 
                         unset($rowData->id);
-                        $x = $item['foreign_key_name'] . '_id';
+                        $x = $item[1] . '_id';
                         $rowData->$x  = $newModel->id;
 
                         $record = json_decode(json_encode($rowData), true);
 
-                        DB::table($item['table_name'])->insert($record );
+                        DB::table($item[0])->insert($record);
                     }
                 });
             }
-        }
+        });
         
-        return Action::message("Selected rows are copied");
+        return Action::message("Selected resources are copied");
     }
 
     public function fields()
