@@ -29,7 +29,7 @@ To get started with Laravel Geo Location, use Composer command to add the packag
 ```
 
 - Define the columns you want to add copy 
-- Columns title, slug and status have default copy values
+- Columns slug and status have default copy values
 
 ```shell
     public function actions(Request $request)
@@ -64,7 +64,7 @@ To get started with Laravel Geo Location, use Composer command to add the packag
         return [
             new NovaResourceCopy([
                 ['name', 'title'], 
-                [['categoriables','categoriable'], ['seos','seoable'], ['job_tag', job]]
+                [['categoriables','categoriable'], ['seos','seoable'], ['job_tag', 'job']]
             ]) 
         ];
     }
